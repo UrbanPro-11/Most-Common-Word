@@ -1,12 +1,12 @@
-import re
-import os
+import re, os
 from collections import Counter
+import wordMode as wm
+import wordLength as wl
 
 # Paths
 script_dir = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(script_dir, 'myText.txt')
 
-# Functions + setup
 def clean_text(text):
     return re.sub(r'[^\w\s]', ' ', text).lower()
 
@@ -25,15 +25,6 @@ def read_from_file(path):
     with open(path, 'r') as f:
         return f.read()
 
-def max_count(words):
-    counts = Counter(words)
-    return max(counts.values()) if counts else 0
-
-def most_common_words(words):
-    counts = Counter(words)
-    max_count = max(counts.values())
-    return [word for word, count in counts.items() if count == max_count]
-
 # Main program
 if input("Write to file? (yes/no): ").strip().lower() in ['y', 'yes']:
     write_to_file(file_path)
@@ -43,10 +34,27 @@ else:
 
 cleaned = clean_text(content)
 words = cleaned.split()
-
 if not words:
     print("No words found.")
-else:
-    common = most_common_words(words)
+
+def most_common():
+    common = wm.most_common_words(words)
     print("Most common word(s):", ", ".join(common))
-    print("Count:", max_count(words))
+    print("Count:", wm.max_count(words))
+
+def average_len():
+    average_length = wl.avg_len(words)
+    total_words = wl.count_words(words)
+    print("There were", total_words, "words in total and", int(average_length*total_words), "characters.")
+    print("The average word length is:", average_length)
+
+choice = input("Would you like to check the average word length or the most common word? ").strip().lower()
+
+if choice in ['most', 'common', 'mode', 'm', 'c', 'most common word', 'most common', 'common word', 'most word',
+              'word most', 'word common']: # I know this is overkill I'm sorry (?)
+    most_common()
+elif choice in ['average', 'len', 'length', 'avg', 'a', 'l', 'average word length', 'word length']:
+    average_len()
+else:
+    most_common()
+    average_len()
